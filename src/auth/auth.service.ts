@@ -41,3 +41,11 @@ export async function loginUser(email: string, passwordPlain: string){
     const token = jwt.sign({userId: user.id}, jwtsecret!, {expiresIn: '24h'});
     return token;
 }
+
+export async function getUser(email: string){
+    if (await isNewUser(email)){
+        throw new Error("The user doesn't exists")
+    }
+    const user: User | null = await prisma.user.findFirst({where: {email: email}});
+    return user;
+}

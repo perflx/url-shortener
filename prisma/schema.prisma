@@ -2,26 +2,28 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
-}
+} //I guess it is a generated code from prisma that can be used by js, since provider = "prisma-client-js"
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-}
-model User{
-  id Int @id @default(autoincrement())
-  email String @unique
-  password String 
-  createdAt DateTime @default(now())
-  links Link[] @relation("LinkAuthor")
+} //DataBase where it takes data. provider - type of db. url - the url to the db
+
+
+model User{ //User model that will be saved in db.
+  id Int @id @default(autoincrement()) //id, integer, by default it is generated via autoincrement
+  email String @unique //email string used for primary user identification, must be unique
+  password String //password as string
+  createdAt DateTime @default(now()) //time of user creation
+  links Link[] @relation("LinkAuthor") //links created by the user, has relation in database to Link model named LinkAuthor
 }
 
 model Link{
-  id Int @id @default(autoincrement())
-  shortCode String @unique
-  originalUrl String
-  clicks Int @default(0)
-  createdAt DateTime @default(now())
-  authorId Int
-  author User @relation("LinkAuthor", fields: [authorId], references: [id])
+  id Int @id @default(autoincrement()) //id, integer, by default it is generated via autoincrement
+  shortCode String @unique //short link
+  originalUrl String //original url
+  clicks Int @default(0) //amount of clicks, the counter must be implemented in ts
+  createdAt DateTime @default(now()) //time of creation
+  authorId Int //id of author
+  author User @relation("LinkAuthor", fields: [authorId], references: [id]) //relation to User model in db, by authorid in Link and id in User
 }
