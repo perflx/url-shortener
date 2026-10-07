@@ -1,36 +1,36 @@
-import { create } from 'node:domain';
-import {createUser, loginUser, getUser, userLinks} from '../auth/auth.service';
+import {createUser, loginUser, getUser, userLinks,
+     ExistingUserError, InvalidCredentialsError, BadRequestError, UserNotFoundError} from '../auth/auth.service';
 import { Request, Response } from 'express';
 
-export { registerController, loginController, userDataController, UserLinksController }
+export { registerController, loginController, userDataController, userLinksController }
 
 async function registerController(req: Request, res: Response){
     try{
         const {email, password} = req.body;
-        try{
-            const result = await createUser(email, password);
-            res.json({success: result});
-        }catch(error){
-            res.status(404).json({success: false, message: "The user already exists"});
-        }
+        await createUser(email, password);
+        res.json({success: true});
     } catch (error){
         console.error(error);
+        if (error instanceof ExistingUserError){
+            res.status(409).json({success: false, message: "The user already exists"});
+        }
         res.status(500).json({success: false, message: "Internal Server Error"});
-    }
+    } 
 }
 
 async function userDataController(req: Request, res: Response){
     try{
         const email = req.params.email;
         if (typeof email !== "string"){
-            res.status(400).json({ success: false, message: "email address is not valid" });
+            res.status(401).json({ success: false, message: "Email address is not valid" });
             return;    
         };
         const user = await getUser(email);
         const result = {id: user?.id, email: user?.email, createdAt: (user?.createdAt)?.toLocaleDateString("en-GB")};
         res.status(200).json(result);
     }catch(error){
-        res.status(404).json({success: false, message: "The user doesn't exist"})
+        if(error instanceof UserNotFoundError) res.status(404).json({success: false, message: "The User was not found"});
+        res.status(500).json({success: false, message: "Internal Server Error"})
         console.error(error);
     }
 }
@@ -38,28 +38,27 @@ async function userDataController(req: Request, res: Response){
 async function loginController(req: Request, res: Response){
     try{
         const {email, password} = req.body;
-        if (typeof email !== "string"){throw new Error("Email is obligatory!")}
-        if (typeof password !== "string") throw new Error("Password must be presented!");
+        if (typeof email !== "string" || typeof password !== "string"){throw new BadRequestError};
         const result = await loginUser(email, password);
-        
-        res.json({success: result});
+        res.json({token: result});
     } catch(error){
-        
-
+        if(error instanceof InvalidCredentialsError) res.status(401).json({success: false, message: "Invalid login or password"});
+        if(error instanceof BadRequestError) res.status(400).json({success: false, message: "Invalid login or password"});
         res.status(500).json({success: false, message: "Internal server error"})
     }
 }
 
-async function UserLinksController(req: Request, res: Response){
+async function userLinksController(req: Request, res: Response){
     try{
         const email = req.params.email;
         if (typeof email !== "string"){
-            res.status(400).json({ success: false, message: "email address is not valid" });
+            res.status(401).json({ success: false, message: "Email address is not valid" });
             return;    
         };
         const links = await userLinks(email);
         res.status(200).json({links: links});
     }catch(error){
+        if(error instanceof UserNotFoundError) res.status(404).json({success: false, message: "The User was not found"});
         res.status(500).json({success: false, message: "Internal server error"});
     }
 }
