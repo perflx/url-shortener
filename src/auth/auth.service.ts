@@ -1,8 +1,15 @@
 import prisma from "../shared/prisma";
-import {User} from "../../src/generated/prisma";
+import {User, Link} from "../../src/generated/prisma";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 import {config} from '../shared/config';
+
+export class InvalidCredentialsError extends Error{
+    constructor(){
+        super("Invalid email or password");
+        this.name = "InvalidCredentialsError";
+    }
+}
 
 
 const jwtsecret = config.jwtsecret;
@@ -26,17 +33,18 @@ export async function createUser(email: string, password: string){
     });
 }
 
+
 export async function loginUser(email: string, passwordPlain: string){
     const user = await prisma.user.findUnique({
         where: {email: email}
     });
     if (!user){
-        throw new Error(`The user doesn't exist`);
+        throw new InvalidCredentialsError;
     }
     const isMatching = await bcrypt.compare(passwordPlain, user.password);
 
     if (!isMatching){
-        throw new Error('Wrong Email or password');
+        throw new InvalidCredentialsError;
     }
     const token = jwt.sign({userId: user.id}, jwtsecret!, {expiresIn: '24h'});
     return token;
@@ -44,8 +52,15 @@ export async function loginUser(email: string, passwordPlain: string){
 
 export async function getUser(email: string){
     if (await isNewUser(email)){
-        throw new Error("The user doesn't exists")
+        throw new InvalidCredentialsError;
     }
-    const user: User | null = await prisma.user.findFirst({where: {email: email}});
+    const user: User | null = await prisma.user.findUnique({where: {email: email}});
     return user;
+}
+
+export async function userLinks(email: string){
+    const user = await prisma.user.findFirst({where: {email: email},
+                                                            include:{links: true},});
+    if (!user) throw new InvalidCredentialsError;
+    return user.links;
 }
