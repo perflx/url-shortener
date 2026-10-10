@@ -1,5 +1,5 @@
-import {createUser, loginUser, getUser, userLinks,
-     ExistingUserError, InvalidCredentialsError, BadRequestError, UserNotFoundError} from '../auth/auth.service';
+import {createUser, loginUser, getUser, userLinks, getUserById} from "./auth.service";
+import {ExistingUserError, InvalidCredentialsError, BadRequestError, UserNotFoundError} from '../shared/errors';
 import { Request, Response } from 'express';
 
 export { registerController, loginController, userDataController, userLinksController }
@@ -20,12 +20,13 @@ async function registerController(req: Request, res: Response){
 
 async function userDataController(req: Request, res: Response){
     try{
-        const email = req.params.email;
-        if (typeof email !== "string"){
-            res.status(401).json({ success: false, message: "Email address is not valid" });
+        const id = req.body.id;
+        console.log(`id: ${id}`);
+        if (typeof id !== "number"){
+            res.status(401).json({ success: false, message: "ID is not valid" });
             return;    
         };
-        const user = await getUser(email);
+        const user = await getUserById(id);
         const result = {id: user?.id, email: user?.email, createdAt: (user?.createdAt)?.toLocaleDateString("en-GB")};
         res.status(200).json(result);
     }catch(error){

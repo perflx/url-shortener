@@ -2,7 +2,8 @@ import express, {type Request, type Response} from 'express';
 import {config} from "../src/shared/config";
 import authRoutes from "./auth/auth.routes";
 import jwt from 'jsonwebtoken';
-
+import {authMiddleware} from "../src/auth/authMiddleware";
+import {userDataController} from "./auth/auth.controller";
 
 const app = express();
 app.use(express.json());
@@ -13,25 +14,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use((req: Request, res: Response, next) => {
-  try{
-    if (typeof req.headers.authorization !== "string"){ res.send(401).json({success: false, message: "No token"}); return};
-    const auth = req.headers.authorization
-    if (typeof auth !== "string") { res.send(401).json({success: false, message: "No token"}); return};
-    const [bearer, token] = auth.split(" ");
-    if (!token){throw new Error};
-    try{
-      const result = jwt.verify(token, config.jwtsecret)
-      console.log(jwt);
-      next();
-    }catch(error){
-      res.send(401).json({success: false, message: "Unathorized"});
-    }
-    
-  }catch(error){
-
-    res.send(401).json({success: false, message: "Token expired"});
+app.use((req, res, next) =>{
+  if (!config.jwtsecret){
+    res.status(404).json({success: false, message: "JWT is not specified"});
   }
+  next();
 });
 
 
@@ -39,6 +26,11 @@ app.get('/test', (req: Request, res: Response) => {
     res.send({express: 'lalalal'});
 });
 
+app.get('/test/token', authMiddleware, (req: Request, res: Response) => {
+  res.send({token: true, id: req.body.id});
+})
+
+app.get("/me", authMiddleware, userDataController);
 app.use("/auth", authRoutes);
 
 

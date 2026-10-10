@@ -3,34 +3,9 @@ import {User} from "../../src/generated/prisma";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 import {config} from '../shared/config';
+import {ExistingUserError, InvalidCredentialsError, BadRequestError, UserNotFoundError} from '../shared/errors';
 
-export class InvalidCredentialsError extends Error{
-    constructor(){
-        super("Invalid email or password");
-        this.name = "InvalidCredentialsError";
-    }
-}
 
-export class ExistingUserError extends Error{
-    constructor(){
-        super("The user already exists");
-        this.name = "ExistingUserError";
-    }
-}
-
-export class UserNotFoundError extends Error{
-    constructor(){
-        super("The User was not found");
-        this.name = "UserNotFoundError";
-    }
-}
-
-export class BadRequestError extends Error{
-    constructor(){
-        super("Bad Request");
-        this.name = "BadRequestError";
-    }
-}
 
 const jwtsecret = config.jwtsecret;
 if (!jwtsecret) throw new Error('JWT_SECRET is not defined in .env');
@@ -72,6 +47,12 @@ export async function loginUser(email: string, passwordPlain: string){
 
 export async function getUser(email: string){
     const user: User | null = await prisma.user.findUnique({where: {email: email}});
+    if (!user) throw new UserNotFoundError;
+    return user;
+}
+
+export async function getUserById(id: number){
+    const user: User | null = await prisma.user.findUnique({where: {id: id}});
     if (!user) throw new UserNotFoundError;
     return user;
 }
