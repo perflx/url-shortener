@@ -32,3 +32,17 @@ export class InvalidTokenError extends Error{
         this.name = "InvalidTokenError";
     }
 }
+
+export class InvalidURLError extends Error{
+    constructor() {
+        super("The URL is invalid");
+        this.name = "InvalidURLError";
+    }
+}
+
+export class LongLinkError extends Error{
+    constructor(){
+        super("The link is too long");
+        this.name = "LongLinkError";
+    }
+}

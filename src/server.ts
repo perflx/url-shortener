@@ -1,6 +1,7 @@
 import express, {type Request, type Response} from 'express';
 import {config} from "../src/shared/config";
 import authRoutes from "./auth/auth.routes";
+import linkRoutes from "./links/links.routes";
 import jwt from 'jsonwebtoken';
 import {authMiddleware} from "../src/auth/authMiddleware";
 import {userDataController} from "./auth/auth.controller";
@@ -21,17 +22,12 @@ app.use((req, res, next) =>{
   next();
 });
 
-
-app.get('/test', (req: Request, res: Response) => {
-    res.send({express: 'lalalal'});
-});
-
 app.get('/test/token', authMiddleware, (req: Request, res: Response) => {
   res.send({token: true, id: req.body.id});
 })
 
 app.get("/me", authMiddleware, userDataController);
 app.use("/auth", authRoutes);
-
+app.use("/links", linkRoutes);
 
 app.listen(config.port, () => console.log(`Listening on http://localhost:${config.port}`));

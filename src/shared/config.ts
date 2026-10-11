@@ -4,6 +4,6 @@ dotenv.config();
 
 export const config = {
     port: process.env.PORT || 5000,
-    jwtsecret: process.env.JWT_SECRET ?? (() => {throw new Error('JWTSECRET is not present')})()
-
+    jwtsecret: process.env.JWT_SECRET ?? (() => {throw new Error('JWTSECRET is not present')})(),
+    url: process.env.URL ?? (() => {throw new Error('URL is not present')})(),
 }

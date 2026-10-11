@@ -1,8 +1,8 @@
-import {createUser, loginUser, getUser, userLinks, getUserById} from "./auth.service";
+import {createUser, loginUser, getUser, getUserById} from "./auth.service";
 import {ExistingUserError, InvalidCredentialsError, BadRequestError, UserNotFoundError} from '../shared/errors';
 import { Request, Response } from 'express';
 
-export { registerController, loginController, userDataController, userLinksController }
+export { registerController, loginController, userDataController }
 
 async function registerController(req: Request, res: Response){
     try{
@@ -46,20 +46,5 @@ async function loginController(req: Request, res: Response){
         if(error instanceof InvalidCredentialsError) res.status(401).json({success: false, message: "Invalid login or password"});
         if(error instanceof BadRequestError) res.status(400).json({success: false, message: "Invalid login or password"});
         res.status(500).json({success: false, message: "Internal server error"})
-    }
-}
-
-async function userLinksController(req: Request, res: Response){
-    try{
-        const email = req.params.email;
-        if (typeof email !== "string"){
-            res.status(401).json({ success: false, message: "Email address is not valid" });
-            return;    
-        };
-        const links = await userLinks(email);
-        res.status(200).json({links: links});
-    }catch(error){
-        if(error instanceof UserNotFoundError) res.status(404).json({success: false, message: "The User was not found"});
-        res.status(500).json({success: false, message: "Internal server error"});
     }
 }

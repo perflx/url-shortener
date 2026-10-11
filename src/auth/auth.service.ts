@@ -56,10 +56,3 @@ export async function getUserById(id: number){
     if (!user) throw new UserNotFoundError;
     return user;
 }
-
-export async function userLinks(email: string){
-    const user = await prisma.user.findFirst({where: {email: email},
-                                                            include:{links: true},});
-    if (!user) throw new UserNotFoundError;
-    return user.links;
-}
