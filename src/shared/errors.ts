@@ -46,3 +46,10 @@ export class LongLinkError extends Error{
         this.name = "LongLinkError";
     }
 }
+
+export class NotExistingURLError extends Error{
+    constructor(){
+        super("The link doesn't exists");
+        this.name = "NotExistingURLError";
+    }
+}

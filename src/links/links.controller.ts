@@ -10,6 +10,7 @@ export async function createLinkController(req: Request, res: Response){
     if (typeof id !== "number"){throw new InvalidTokenError}; 
     const short = await createLink(id, link);
     res.status(201).json({success: true, id: id, originalURL: link, shortURL: config.url + short});
+    return;
     }catch(error){
         if(error instanceof InvalidURLError || error instanceof LongLinkError || error instanceof LongLinkError){
             res.status(400).json({success: false, message: error.message});
@@ -33,8 +34,10 @@ export async function userLinksController(req: Request, res: Response){
         };
         const links = await userLinks(id);
         res.status(200).json({links: links});
+        return;
     }catch(error){
-        if(error instanceof UserNotFoundError) res.status(404).json({success: false, message: "The User was not found"});
+        if(error instanceof UserNotFoundError) {res.status(404).json({success: false, message: "The User was not found"}); return;}
         res.status(500).json({success: false, message: "Internal server error"});
+        return;
     }
 }
