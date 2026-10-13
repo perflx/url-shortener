@@ -1,4 +1,5 @@
 import prisma from "../shared/prisma";
+import {Prisma} from "../generated/prisma";
 import {InvalidURLError} from "../shared/errors";
 import { NotExistingURLError } from "../shared/errors";
 
@@ -14,9 +15,9 @@ export async function getOriginalLink(shortCode: string){
 export async function incrementCount(shortCode: string){
     try{
     const updatedLink = await prisma.link.update({where: {shortCode: shortCode}, data: {clicks: {increment: 1}}});
-    if (!updatedLink){throw new NotExistingURLError};
     return updatedLink;
     }catch(error){
-        
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025"){throw new NotExistingURLError}
+        throw error;
     }
 }

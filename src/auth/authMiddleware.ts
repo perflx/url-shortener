@@ -18,7 +18,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction){
     
   }catch(error){
     if (error instanceof InvalidTokenError){res.status(401).json({success: false, message: "Invalid token"}); return;}
-    res.status(401).json({success: false, message: "Token expired"});
+    res.status(401).json({success: false, message: "Invalid token"});
     return;
   }
   next();

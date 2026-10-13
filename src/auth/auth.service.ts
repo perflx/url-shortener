@@ -1,4 +1,5 @@
 import prisma from "../shared/prisma";
+import { Prisma } from "../generated/prisma";
 import {User} from "../../src/generated/prisma";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
@@ -19,13 +20,13 @@ async function isNewUser(email: string): Promise<boolean>{
 
 
 export async function createUser(email: string, password: string){
-    if (!await isNewUser(email)){
-        throw new ExistingUserError;
+    try{
+        const crypted = await bcrypt.hash(password, 10);
+        await prisma.user.create({data: {email: email,  password: crypted}});
+    }catch(error){
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002"){throw new ExistingUserError}
+        throw error;
     }
-    const crypted = await bcrypt.hash(password, 10);
-    await prisma.user.create({
-        data: {email: email,  password: crypted}
-    });
 }
 
 
