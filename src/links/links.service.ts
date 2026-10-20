@@ -1,5 +1,5 @@
 import prisma from "../shared/prisma";
-import {InvalidURLError, LongLinkError, UserNotFoundError} from "../shared/errors";
+import {InvalidURLError, LongLinkError, UserNotFoundError, TooManyLinksError} from "../shared/errors";
 import { nanoid } from "nanoid";
 
 export function normalizeLink(link:string): URL{
@@ -31,8 +31,16 @@ export async function isNewLink(link: string): Promise<boolean>{
     return shortCode === null;
 } 
 
+async function linksCreatedLastDay(id: number){
+    const time = new Date(new Date().getTime() - (24 * 60  * 60 * 1000));
+    const links = await prisma.link.count({where: {authorId: id, createdAt: {gt: time}}});
+    return links;
+}
 
 export async function createLink(id: number, link: string){
+    if (await linksCreatedLastDay(id) >= 10){
+        throw new TooManyLinksError;
+    }
     const normalizedLink = normalizeLink(link);
     let short: string;
     do{

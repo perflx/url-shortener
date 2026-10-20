@@ -29,8 +29,8 @@ export class UserNotFoundError extends AppError{
 }
 
 export class BadRequestError extends AppError{
-    constructor(){
-        super("Bad Request", 400);
+    constructor(message?: string){
+        message ? super(message, 400) : super("Bad Request", 400);
         this.name = "BadRequestError";
     }
 }
@@ -60,5 +60,12 @@ export class NotExistingURLError extends AppError{
     constructor(){
         super("The link doesn't exists", 404);
         this.name = "NotExistingURLError";
+    }
+}
+
+export class TooManyLinksError extends AppError{
+    constructor(){
+        super("Amount of created links for 24hr is exceeded", 429);
+        this.name = "TooManyLinksError";
     }
 }

@@ -5,9 +5,7 @@ import { Request, Response } from 'express';
 export { registerController, loginController, userDataController }
 
 async function registerController(req: Request, res: Response){
-        if (!req.body){throw new BadRequestError}
         const {email, password} = req.body;
-        if (!email || !password){throw new BadRequestError};
         await createUser(email, password);
         res.status(201).json({success: true});
 }

@@ -8,7 +8,7 @@ export async function createLinkController(req: Request, res: Response){
     if (typeof link !== "string"){throw new InvalidURLError}
     if (typeof id !== "number"){throw new InvalidTokenError}; 
     const short = await createLink(id, link);
-    res.status(201).json({success: true, id: id, originalURL: link, shortURL: config.url + short});
+    res.status(201).json({success: true, id: id, originalURL: link, shortCode: short, shortURL: config.url + short});
 }
 
 export async function userLinksController(req: Request, res: Response){
