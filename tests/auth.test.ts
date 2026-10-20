@@ -137,7 +137,7 @@ describe("POST /link", ()=>{
 
   it("creates shortened link", async ()=>{
     const originalURL = "https://www.youtube.com/";
-    const res = await request(app).post("/link")
+    const res = await request(app).post("/links")
       .set(`Authorization`, `Bearer ${authToken}`)
       .send({link: originalURL});
     link = {shortURL: res.body.shortCode, originalURL: originalURL};
@@ -145,14 +145,14 @@ describe("POST /link", ()=>{
   })
 
   it("tries to create without link", async() =>{
-    const res = await request(app).post("/link")
+    const res = await request(app).post("/links")
       .set(`Authorization`, `Bearer ${authToken}`)
       .send();
       expect(res.status).toBe(400);
   })
 
   it("tries to create with wrong data", async() =>{
-    const res = await request(app).post("/link")
+    const res = await request(app).post("/links")
       .set(`Authorization`, `Bearer ${authToken}`)
       .send({email: "ab@gmail.com", password: "12345678"});
       expect(res.status).toBe(400);
@@ -162,7 +162,7 @@ describe("POST /link", ()=>{
     for (let i = 0; i < 9; i++ ){
       await request(app).post("/link").set(`Authorization`, `Bearer ${authToken}`).send({link: "https://www.youtube.com/"});
     }
-    const res = await request(app).post("/link")
+    const res = await request(app).post("/links")
       .set(`Authorization`, `Bearer ${authToken}`)
       .send({link: "https://www.youtube.com/"});
     expect(res.status).toBe(429);
@@ -170,7 +170,7 @@ describe("POST /link", ()=>{
 
   it("creates link without authorization", async ()=>{
 
-    const res = await request(app).post("/link")
+    const res = await request(app).post("/links")
       .send({link: "https://www.youtube.com/"});
     expect(res.status).toBe(401);
   })

@@ -1,6 +1,6 @@
 import {InvalidTokenError} from "../shared/errors";
 import jwt from "jsonwebtoken";
-import {config} from "../../src/shared/config";
+import {config} from "../shared/config";
 import { Request, Response, NextFunction } from 'express';
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction){

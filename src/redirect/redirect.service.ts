@@ -1,5 +1,5 @@
 import prisma from "../shared/prisma";
-import {Prisma} from "../generated/prisma";
+import { Prisma } from "@prisma/client";
 import {InvalidURLError} from "../shared/errors";
 import { NotExistingURLError } from "../shared/errors";
 

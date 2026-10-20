@@ -1,9 +1,9 @@
 import express, {NextFunction, type Request, type Response} from 'express';
-import {config} from "../src/shared/config";
+import {config} from "./shared/config";
 import authRoutes from "./auth/auth.routes";
 import linkRoutes from "./links/links.routes";
 import redirectRoutes from "./redirect/redirect.router";
-import {authMiddleware} from "../src/auth/authMiddleware";
+import {authMiddleware} from "./auth/authMiddleware";
 import {userDataController} from "./auth/auth.controller";
 import { AppError } from './shared/errors';
 import {authLimiter } from "./links/linksMiddleware";
@@ -29,7 +29,7 @@ app.use((req, res, next) =>{
 
 app.get("/me", authMiddleware, userDataController);
 app.use("/auth", authLimiter, authRoutes);
-app.use("/link", linkRoutes);
+app.use("/links", linkRoutes);
 app.use("", redirectRoutes);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
