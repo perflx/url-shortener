@@ -10,6 +10,15 @@ import {authLimiter } from "./links/linksMiddleware";
 import cors from 'cors';
 
 const app = express();
+app.use((req, res, next) =>{
+  if (!config.frontendUrl){
+    res.status(404).json({success: false, message: "FRONTEND_URL is not specified"});
+    return;
+  }
+  next();
+});
+
+
 app.use(cors({ origin: config.frontendUrl ?? false }));
 app.use(express.json());
 
