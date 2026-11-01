@@ -6,8 +6,8 @@ export { registerController, loginController, userDataController }
 
 async function registerController(req: Request, res: Response){
         const {email, password} = req.body;
-        await createUser(email, password);
-        res.status(201).json({success: true});
+        const token = await createUser(email, password);
+        res.status(201).json({token: token});
 }
 
 async function userDataController(req: Request, res: Response){

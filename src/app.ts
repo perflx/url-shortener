@@ -7,8 +7,10 @@ import {authMiddleware} from "./auth/authMiddleware";
 import {userDataController} from "./auth/auth.controller";
 import { AppError } from './shared/errors';
 import {authLimiter } from "./links/linksMiddleware";
+import cors from 'cors';
 
 const app = express();
+app.use(cors({ origin: config.frontendUrl ?? false }));
 app.use(express.json());
 
 
@@ -24,8 +26,6 @@ app.use((req, res, next) =>{
   }
   next();
 });
-
-
 
 app.get("/me", authMiddleware, userDataController);
 app.use("/auth", authLimiter, authRoutes);

@@ -17,11 +17,24 @@ async function isNewUser(email: string): Promise<boolean>{
     return user === null;
 }
 
+export async function jwtToken(email: string){
+    const user = await prisma.user.findUnique({
+        where: {email: email}
+    });
+    if (!user){
+        throw new InvalidCredentialsError;
+    }
+    const token = jwt.sign({userId: user.id}, jwtsecret!, {expiresIn: '24h'})
+    return token;
+}
+
 
 export async function createUser(email: string, password: string){
     try{
         const crypted = await bcrypt.hash(password, 10);
         await prisma.user.create({data: {email: email,  password: crypted}});
+        const token = jwtToken(email);
+        return token;
     }catch(error){
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002"){throw new ExistingUserError}
         throw error;
