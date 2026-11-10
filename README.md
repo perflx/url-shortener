@@ -2,11 +2,12 @@
 
 A URL shortening service built with TypeScript and Express. Think Bitly, but yours.
 
-The backend is done, tested and deployed. A frontend is planned.
+The backend is done, tested and deployed. Frontend: [url-shortener-web](https://github.com/perflx/url-shortener-web).
 
 ## Live demo
 
 API base URL: **https://url-shortener-d53t.onrender.com**
+Live app: **https://url-shortener-perflx.onrender.com**
 
 > The API runs on Render's free tier, which puts the service to sleep after a period of inactivity. The first request after a pause can take up to a minute while it wakes up; later requests are fast.
 
@@ -161,6 +162,5 @@ tests/         # Vitest + Supertest tests
 
 - [x] Request validation with Zod and tests
 - [x] Deploy with a public demo link
-- [ ] Frontend (React + TypeScript)
+- [x] Frontend (React + TypeScript)
 - [ ] Docker (Dockerfile + compose)
-- [ ] Handle short code collisions by retrying on unique constraint error
